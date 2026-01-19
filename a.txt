@@ -1,0 +1,79 @@
+Faire des recherches sur :
+
+terme a savoir :
+
+docker
+docker compose
+container
+dockerfiles
+docker images
+
+One docker for :
+ - NGINX
+ - WordPress (database)
+ - MariaDB
+
+Volume ?
+
+docker-network
+
+----------------------------------------------------------------------------------------------
+
+Source:
+https://tuto.grademe.fr/inception/
+https://dev.to/alejiri/docker-nginx-wordpress-mariadb-tutorial-inception42-1eok
+https://www.educative.io/blog/docker-kubernetes-beginners-guide
+
+----------------------------------------------------------------------------------------------
+
+
+Docker compose		=> coordinate several containers
+Dockerfile			=> have the instructions to create Docker image.
+Docker images		=> read only, 
+
+
+
+
+Docker engine ??	=> moteur systeme Docker, create & execute containers
+
+
+----------------------------------------------------------------------------------------------
+
+
+Docker, separe les processus afin qu'ils s'executes de maniere independantes
+
+quelques commandes:
+	docker run <nom_image> = permet de demarrer un conteneur 
+	docker ps = liste des conteneurs actifs
+	docker ps -a = liste de tous les conteneur meme ceux eteint
+	docker restart <id_conteneur> = redemarre un conteneur avec les 2 permiers nombre de l'id
+	docker stop <id_conteneur> = arrete un conteneur avec les 2 premier nombre de l'id
+	docker rm <id_conteneur> = supprimer definitivement un conteneur
+
+	docker build <chemin_dockerfile> = build l'image du conteneur
+	docker image ls = indique le nom de image a run
+
+
+----------------------------------------------------------------------------------------------
+
+Dockerfile
+
+mot-clefs
+	FROM = permier mot clef du dockerfile, indique sous quel OS doit tourner
+	RUN = 
+	COPY = permet de copier un fichier avec le chemin
+	EXPOSE = informe Docker le port reseau du conteneur
+	ENTRYPOINT = permet de lancer une commande au lancement du conteneur
+
+----------------------------------------------------------------------------------------------
+
+Docker compose
+
+permet de creer un ficher YALM
+
+
+----------------------------------------------------------------------------------------------
+
+container for
+
+NGINX	logiciel open source utilise comme serveur web
