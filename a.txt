@@ -7,6 +7,7 @@ docker compose
 container
 dockerfiles
 docker images
+TSL
 
 One docker for :
  - NGINX
@@ -44,6 +45,7 @@ Docker, separe les processus afin qu'ils s'executes de maniere independantes
 
 quelques commandes:
 	docker run <nom_image> = permet de demarrer un conteneur 
+		with -it = ouvre le terminal du conteneur
 	docker ps = liste des conteneurs actifs
 	docker ps -a = liste de tous les conteneur meme ceux eteint
 	docker restart <id_conteneur> = redemarre un conteneur avec les 2 permiers nombre de l'id
@@ -51,6 +53,7 @@ quelques commandes:
 	docker rm <id_conteneur> = supprimer definitivement un conteneur
 
 	docker build <chemin_dockerfile> = build l'image du conteneur
+		with -f = donne un nom au build
 	docker image ls = indique le nom de image a run
 
 
@@ -69,11 +72,32 @@ mot-clefs
 
 Docker compose
 
-permet de creer un ficher YALM
+fichier en YALM -> .ylm
+Fichier qui va s'occuper de build tous les containers, créer des reseaux ...
+
+commandes
+	docker-compose -f <path_docker_compose> -d  -build -> build le fichier
+	docker-compose -f <path_docker_compose> stop -> pour arreter
+	docker-compose -f <path_docker_compose> down -v -> supprime le buld
 
 
 ----------------------------------------------------------------------------------------------
 
 container for
 
-NGINX	logiciel open source utilise comme serveur web
+NGINX		-> logiciel open source utilise comme serveur web
+MariaDB		-> copy de MySQL en open source (car MySQL a été racheté par Oracle)
+				-> base de données organisée sous forme de tableau
+WordPress	-> systeme de gestion de contenu, gratuit et open source
+				-> utilisé pour créer des site web
+
+
+----------------------------------------------------------------------------------------------
+
+Resume personnel ...
+
+On creer des dossiers dans lesquels on créer des dockerfiles
+Grace a ces dockerfiles ont peut les build avec "docker build ." pour créer un container.
+Dans le dockerfiles on donne les commandes a réaliser lors de la crétion du container \ 
+pour installer tout ce dont il a besoin.
+Cela crée une image qu'on pourra run avec "docker run <image>"
