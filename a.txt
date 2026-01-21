@@ -63,7 +63,7 @@ Dockerfile
 
 mot-clefs
 	FROM = permier mot clef du dockerfile, indique sous quel OS doit tourner
-	RUN = 
+	RUN = execute une commande au demarrage de la vm
 	COPY = permet de copier un fichier avec le chemin
 	EXPOSE = informe Docker le port reseau du conteneur
 	ENTRYPOINT = permet de lancer une commande au lancement du conteneur
@@ -79,6 +79,14 @@ commandes
 	docker-compose -f <path_docker_compose> -d  -build -> build le fichier
 	docker-compose -f <path_docker_compose> stop -> pour arreter
 	docker-compose -f <path_docker_compose> down -v -> supprime le buld
+
+configuration element of docker compose
+	services:
+		build: path to directory to dockerfile
+		ports: maps container ports to host ports (3000:3000)
+		volumes: path to defines mounted volumes
+		environment: set environment variables inside the container
+		image: use a pre-built Docker image
 
 
 ----------------------------------------------------------------------------------------------
