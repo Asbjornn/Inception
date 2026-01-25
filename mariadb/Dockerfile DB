@@ -1,0 +1,8 @@
+FROM debian:bookworm
+RUN apt update && apt install -y \ 
+    mariadb-server \
+    mariadb-client \
+RUN mkdir -p /var/run/mysqld && chown -R mysqld:mysqld /var/run/mysqld
+COPY conf/init.sql /docker-entrypoint.initdb.d/
+EXPOSE 3306
+CMD ["mysqld"]
