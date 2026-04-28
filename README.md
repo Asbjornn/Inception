@@ -78,14 +78,57 @@ I used AI to have answer on specific question to fully undestand them and to cre
 
 ### - _Secrets vs Environment Variables_
 
-bla bla bla
+|          | Secrets 		| Environment Variables	|
+|----------|----------------|-----------------------|
+|Security  |High   			|Low    		  		|
+|Visibility|Hiden			|Visible       			|
+|Usage     |Sensitive data	|Config general			|
+|Format    |File			|string					|
+
+You can see all the environment variables with **_docker inspect_**
 
 ### - _Docker Network vs Host Network_
 
-bla bla bla
+**Docker network** is setup with
+```
+docker run -p 3000:3000 ...
+```
+Expose the port 3000 with -p  
+Create a virtual network where each container has his own IP.
+The network is fully isolated more secure and avoid port conflict.
 
-### - _Docker Volumes vs Blind Mounts_
+<br>
 
-bla bla bla
+
+**Host Network** is setup with
+```
+docker run --network host ...
+```
+The container use the network of the host.  
+It share IP, ports, stack network.
+Maximum performance without NAT and minumum latency.
+
+<br>
+
+**NAT** = Network Address Translation  
+Used by *routers* to use only one public address IP to communicate with internet.
+
+
+### - _Docker Volumes vs Bind Mounts_
+
+**Docker Volumes** is setup by Docker with
+```
+docker run -v nginx_logs:/etc/nginx/nginx.conf nginx
+```
+Store in /var/lib/docker/volumes/  
+We use it cause it's secure, portable and easy to backup.
+
+**Bind Mounts** is setup with
+```
+docker run -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf nginx
+```
+It link the directory to the container  
+Really usefull to access to files from the host.  
+But less secure cause it can modify the system
 
 [back to top](#top)
