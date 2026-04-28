@@ -1,0 +1,38 @@
+[mysql]
+
+# execute mariaDB avec l'utilisateur mysql
+user = mysql
+
+# port utilisé pour les connexions
+port = 3306
+
+# fichier avec le PID
+pid-file = /run/mysql/mysql.pid
+
+# repertoire d'installation de mariaDB
+basedir = /usr
+
+# fichier de donnée 
+datadir = /var/lib/mysql
+
+# fichier temporaire
+tmpdir = /tmp
+
+# fichier de traduction
+lc-messages-dir = /usr/share/mysql
+
+# langue utilisée
+lc-messages = en_US
+
+# désactive les vérouillage externe
+skip-external-locking
+
+# accepte les connexions depuis toutes interfaces réseau
+bind-address = 0.0.0.0
+
+# supprime les logs de plus de 10j
+expire_logs_days = 10
+
+# encodage par défaut
+character-set-server = utf8mb4
+collation-server = utf8mb4_general_ci

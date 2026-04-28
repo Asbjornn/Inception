@@ -101,6 +101,21 @@ WordPress	-> systeme de gestion de contenu, gratuit et open source
 
 
 ----------------------------------------------------------------------------------------------
+NGINX
+nginx joue le rôle de porte d'entrée sécurisée.
+Il accepte les connexions HTTPS (port 443), déchifre le TLS
+puis transmet les requête PHP a WordPress via FastCGI.
+
+WordPress
+Communique avec nginx via le port 9000 uniquement en FastCGI
+PHP-FPM (FastCGI Processus Manager) -> gesionnaire de processus PHP.
+Reçois les requête FastCGU de nginx, execute le code PHP de WordPress et renvois le resultat
+
+MariaDB
+mariaDB est le moteur de base de donnée qui stocke le contenu de WordPress.
+il ne doit être accessible uniquement depuis le container WordPress et pas depuis l'exterieur.
+
+----------------------------------------------------------------------------------------------
 
 Resume personnel ...
 
