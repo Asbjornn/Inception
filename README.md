@@ -7,8 +7,15 @@
 
 1. [Description](#description)
 2. [Instruction](#instructions)
+	- [Installation](#installation)
+	- [Compilation](#compilation)
+	- [Execution](#execution)
 3. [Ressources](#ressources)
-3. [Project Description](#projet-description)
+4. [Project Description](#projet-description)
+	- [Virtual Machines vs Docker](#--virtual-machines-vs-docker)
+	- [Secrets vs Environment Variables](#--secrets-vs-environment-variables)
+	- [Docker Network vs Host Network](#--docker-network-vs-host-network)
+	- [Docker Volumes vs Bind Mounts](#--docker-volumes-vs-bind-mounts)
 
 ## __Description__
 
@@ -45,14 +52,35 @@ Our goal on this project is to use docker to create :
 
 ## __Instructions__
 
-### Information about
-- compilation
-- installation
-- execution
+### Installation
+
+You can clone the project with github with
+```
+git clone ... inception
+```
+
+### Compilation
+To compile the project you can run the command
+```
+make
+```
+<br>
+
+To stop, run the command
+```
+make down
+```
+and clean everything with
+```
+make clean
+make fclean
+```
+### Execution
 
 
 ## __Ressources__
 
+### References used to do Inception
 I used these website to start the project, to have a overview of the project and some notions (Docker, container ...).  
 - [Website 1](https://tuto.grademe.fr/inception/)  
 - [Website 2](https://medium.com/@ssterdev/inception-guide-42-project-part-i-7e3af15eb671)  
@@ -63,9 +91,12 @@ After that i used a online tuto to see in what direction i need to go.
 
 I used AI to have answer on specific question to fully undestand them and to create a PDF to help me for the building of the all project.
 
-### References used to do Inception
 
 # Projet description
+
+## Docker
+Docker allow us to create environment called **containers** to isolate the applications.  
+The main benefits of using docker and containers is that it dont use a lot of ressources and share kernel. With that it is really compatible
 
 ### - _Virtual Machines vs Docker_
 
@@ -75,6 +106,7 @@ I used AI to have answer on specific question to fully undestand them and to cre
 |GB memory used    |MG memory            |
 |Full OS for VM    |Share host OS kernel |
 
+<br>  
 
 ### - _Secrets vs Environment Variables_
 
@@ -86,6 +118,8 @@ I used AI to have answer on specific question to fully undestand them and to cre
 |Format    |File			|string					|
 
 You can see all the environment variables with **_docker inspect_**
+
+<br>
 
 ### - _Docker Network vs Host Network_
 
@@ -113,6 +147,7 @@ Maximum performance without NAT and minumum latency.
 **NAT** = Network Address Translation  
 Used by *routers* to use only one public address IP to communicate with internet.
 
+<br>
 
 ### - _Docker Volumes vs Bind Mounts_
 
@@ -127,8 +162,8 @@ We use it cause it's secure, portable and easy to backup.
 ```
 docker run -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf nginx
 ```
-It link the directory to the container  
+It link the directory to the container.  
 Really usefull to access to files from the host.  
-But less secure cause it can modify the system
+But less secure cause it can modify the system.
 
 [back to top](#top)
