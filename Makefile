@@ -1,8 +1,13 @@
 LOGIN = gcauchy
 COMPOSE = srcs/docker-compose.yml
 
-all:
-	docker-compose -f $(COMPOSE) up --build -d
+all: build
+
+build:
+	docker-compose -f $(COMPOSE) build
+
+up:
+	docker-compose -f $(COMPOSE) up -d
 
 down:
 	docker-compose -f $(COMPOSE) down
@@ -13,6 +18,6 @@ clean: down
 fclean: clean
 	docker system prune -af
 
-re: fclean all
+re: fclean build up
 
-.PHONY: all down clean fclean re
+.PHONY: all build up down clean fclean re
