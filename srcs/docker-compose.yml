@@ -4,7 +4,7 @@ services:
     container_name: mariadb
     restart: always
     volumes:
-     - mariadb:/var/lib/mysqld
+     - mariadb:/var/lib/mysql
     networks:
      - inception
     env_file: .env
@@ -51,14 +51,14 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Users/Gabin/data/mariadb
+      device: /home/gcauchy/data/mariadb
 
   wordpress:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /Users/Gabin/data/wordpress
+      device: /home/gcauchy/data/wordpress
 
 secrets:
   db_password:

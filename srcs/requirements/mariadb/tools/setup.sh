@@ -1,29 +1,28 @@
 #!/bin/bash
-
 set -e
 
-# Lire les secrets Docker (montés dans /run/secrets/)
 DB_PASSWORD=$(cat /run/secrets/db_password)
 DB_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
 
-if [ ! -d /var/lib/mysql/mysql ]; then
+if [ ! -f /var/lib/mysql/.initialized ]; then
+    echo "Initializing database..."
     mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null
 
-    # démarre mariaDB temporairement pour la configurer
-    until mysqld_safe --skip-networking; do & 
-        sleep 1
-    done
+    mysqld --user=mysql --skip-networking &
+    until mysqladmin ping --silent; do sleep 1; done
 
     mysql -u root <<-EOF
-        ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASSWORD}';
-        CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
-        CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
-        GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
-        FLUSH PRIVILEGES;
+	ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASSWORD}';
+	CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+	CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+	GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
+	FLUSH PRIVILEGES;
 EOF
 
-    # arrete mariaDB temporaire
-    mysqladmin u root -p"${DB_ROOT_PASSWORD}" shutdown
+    mysqladmin -u root -p"${DB_ROOT_PASSWORD}" shutdown
+    touch /var/lib/mysql/.initialized
+    echo "Database initialized."
 fi
 
-exec mysqld_safe
+echo "Starting MariaDB (normal mode)..."
+exec mysqld --user=mysql
