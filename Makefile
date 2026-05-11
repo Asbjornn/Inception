@@ -1,4 +1,3 @@
-LOGIN = gcauchy
 COMPOSE = srcs/docker-compose.yml
 
 all: build

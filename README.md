@@ -143,48 +143,46 @@ You can see all the environment variables with **_docker inspect_**
 
 ### - _Docker Network vs Host Network_
 
-**Docker network** is setup with
-```
-docker run -p 3000:3000 ...
-```
-Expose the port 3000 with -p  
-Create a virtual network where each container has his own IP.
-The network is fully isolated more secure and avoid port conflict.
+Docker network have 6 differents types:
+- Bridge
+- Host
+- Overlay
+- Macvlan
+- Ipvlan
+- None
+
+We can setup these network type in the docker-compose.yml file.
 
 <br>
 
-
-**Host Network** is setup with
-```
-docker run --network host ...
-```
-The container use the network of the host.  
-It share IP, ports, stack network.
-Maximum performance without NAT and minimum latency.
+**Docker network**  
+The driver:bridge create an isolated virtual network where each container has it own internal IP address.  
+Containers communicate with each other via service name (mariadb, wordpress, ...), without exposing any port to the outside world.
 
 <br>
 
-**NAT** = Network Address Translation  
-Used by *routers* to use only one public address IP to communicate with internet.
+The **Host Network** completely eliminates network isolation between the container and the host machine. The container directly shares the host's network interface.  
+This type is used to have the best performence possible.
+
+<br>
+
+In this project, i used bridge network because containers need to communicate securely without exposing unnecessary ports to the host.
 
 <br>
 
 ### - _Docker Volumes vs Bind Mounts_
 
-**Docker Volumes** is setup by Docker with
-```
-docker run -v nginx_logs:/etc/nginx/nginx.conf nginx
-```
-Store in /var/lib/docker/volumes/  
-We use it cause it's secure, portable and easy to backup.
+|           |Docker volumes  |Bind mounts		|
+|-----------|----------------|------------------|
+|Gestion	|Docker		  	 |Host				|
+|Portability|Yes		 	 |No				|
+|Typical Use|Data Persistence|Direct file access|
+|Security	|Better Isolation|Less Isolation	|
 
-**Bind Mounts** is setup with
-```
-docker run -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf nginx
-```
-It link the directory to the container.  
-Really useful to access to files from the host.  
-But less secure cause it can modify the system.
+Docker volume store in the path **/var/lib/docker/volumes/...**  
+Bind Mounts use the path setup in the docker-compose.yml file.
+
+I used names volumes with bind driver_opts because it combines the readability of the named volumes in compose with direct access to a specific host path.
 
 <br>
 <br>
