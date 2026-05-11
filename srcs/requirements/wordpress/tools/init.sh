@@ -8,13 +8,15 @@ USER_PASSWORD=$(cat /run/secrets/credentials | grep USER_PASS | cut -d= -f2)
 
 WP_DIR=/var/www/html
 
-# Télécharger WordPress s'il n'est pas déjà là
-if [ ! -f ${WP_DIR}/wp-config.php ] || ! wp core is-installed --path=${WP_DIR} --allow-root 2>/dev/null; then
+mkdir -p ${WP_DIR}
 
-    # Télécharger WordPress
+if [ ! -f ${WP_DIR}/index.php ]; then
+    echo "Downloading WordPress..."
     wp core download --path=${WP_DIR} --allow-root
+fi
 
-    # Créer wp-config.php avec les infos de la BDD
+if [ ! -f ${WP_DIR}/wp-config.php ]; then
+    echo "Creating wp-config.php..."
     wp config create \
         --path=${WP_DIR} \
         --dbname=${MYSQL_DATABASE} \
@@ -22,15 +24,16 @@ if [ ! -f ${WP_DIR}/wp-config.php ] || ! wp core is-installed --path=${WP_DIR} -
         --dbpass=${DB_PASSWORD} \
         --dbhost=mariadb \
         --allow-root
+fi
 
-    # Attendre que MariaDB soit prêt
-    while ! wp db check --path=${WP_DIR} --allow-root 2>/dev/null; do
-        echo 'En attente de MariaDB...'
-        sleep 2 
-    done
+while ! wp db check --path=${WP_DIR} --allow-root 2>/dev/null; do
+    echo 'En attente de MariaDB...'
+    sleep 2 
+done
 
+if ! wp core is-installed --path=${WP_DIR} --allow-root 2>/dev/null; then
+    echo "Installing WordPress..."
 
-    # Installer WordPress (crée les tables en BDD)
     wp core install \
         --path=${WP_DIR} \
         --url=https://${DOMAIN_NAME} \
@@ -40,16 +43,14 @@ if [ ! -f ${WP_DIR}/wp-config.php ] || ! wp core is-installed --path=${WP_DIR} -
         --admin_email=${ADMIN_EMAIL} \
         --allow-root
 
-    # Créer un 2e utilisateur (exigé par le sujet)
     wp user create ${WP_USER} ${WP_USER_EMAIL} \
         --role=author \
         --user_pass=${USER_PASSWORD} \
         --path=${WP_DIR} \
         --allow-root
-
-    # Corriger les permissions
-    chown -R www-data:www-data ${WP_DIR}
 fi
+
+chown -R www-data:www-data ${WP_DIR}
 
 # Lancer PHP-FPM en foreground
 exec php-fpm8.2 -F

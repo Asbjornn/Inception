@@ -1,7 +1,10 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 RUN apt-get update && apt-get install -y \
-    wget curl php7.4-fpm php7.4-mysql mariadb-client && 
+    wget curl \
+    php8.2-fpm php8.2-mysql php8.2-curl \
+    php8.2-gd php8.2-xml php8.2-mbstring \
+    mariadb-client && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \

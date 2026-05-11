@@ -1,4 +1,4 @@
-[mysql]
+[mysqld]
 
 # execute mariaDB avec l'utilisateur mysql
 user = mysql
@@ -7,7 +7,7 @@ user = mysql
 port = 3306
 
 # fichier avec le PID
-pid-file = /run/mysql/mysql.pid
+pid-file = /run/mysqld/mysqld.pid
 
 # repertoire d'installation de mariaDB
 basedir = /usr

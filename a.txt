@@ -124,3 +124,49 @@ Grace a ces dockerfiles ont peut les build avec "docker build ." pour créer un 
 Dans le dockerfiles on donne les commandes a réaliser lors de la crétion du container \ 
 pour installer tout ce dont il a besoin.
 Cela crée une image qu'on pourra run avec "docker run <image>"
+
+
+
+
+
+
+
+
+
+
+
+
+================================================================================================================
+
+Docker compose
+
+les services:
+_name_:
+    build: ./requirements/mariadb	=> chemin vers l'image du container
+    container_name: mariadb			=> nom du container
+    restart: always					=> permet de redemarrer si crash
+    volumes:						=> monte le volume mariadb dans le dossier /var/lib/mysql
+     - mariadb:/var/lib/mysql		   format volume:path
+    networks:						=> connecte le container au reseau inception
+     - inception
+    env_file: .env					=> charge les variable du .env dans le container 
+									   (comme un export DOMAIN_NAME=gcauchy.42.fr)
+    secrets:						=> chaque secret devient un fichier dans le container
+      - db_password					   avec le path /run/secrets/db_password
+      - db_root_password
+
+networks:							=> reseau virtuel nommé inception
+	inception:						=> type bridge = réseau isolé, communication uniquement entre eux
+		driver:bridge				
+
+volumes:
+	mariadb:
+		driver:local				=> stockage local
+		driver_opts:				=> options pour le driver
+			type: none				=> pas de systeme de fichier special
+			o: bind					=> lie un ficher au container
+			device: /home/gcauchy/data/mariadb	=> chemin sur de l'hote du volume
+
+secrets:
+	db_password:
+		file: ../secrets/db_password	=> path vers le secret
