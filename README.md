@@ -137,7 +137,8 @@ The main benefits of using docker and containers is that it doesn't use a lot of
 |Usage     |Sensitive data	|Config general			|
 |Format    |File			|string					|
 
-You can see all the environment variables with **_docker inspect_**
+In this project, the environment variables are in the **.env** file at the root.  
+And the secrets are in the **.secrets** directory at the root too.u
 
 <br>
 
