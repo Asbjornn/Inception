@@ -170,3 +170,23 @@ volumes:
 secrets:
 	db_password:
 		file: ../secrets/db_password	=> path vers le secret
+
+
+
+================================================================================================================
+
+Les mots de passe
+
+- credentials.txt
+
+ADMIN_PASS
+Mot de passe admin pour Wordpress, permet de se connecter a /wp-admin pour gerer Wordpress
+
+USER_PASS
+Mot de pass pour utilisateur secondaire, permet de se connecter comment auteur/editeur sans tous les droits
+
+- db_password.txt
+Mot de passe utilisateur MariaDB pour Wordpress, permet a Wordpress de se connecter a MariaDB pour lire et ecrire
+
+-db_root_password
+Super mot de passe MariaDB, pour l'administration globale de MariaDB
