@@ -10,6 +10,7 @@ RUN mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld
 COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 COPY tools/setup.sh /setup.sh
 RUN chmod +x /setup.sh
+RUN chmod 644 /etc/mysql/mariadb.conf.d/50-server.cnf
 
 EXPOSE 3306
 

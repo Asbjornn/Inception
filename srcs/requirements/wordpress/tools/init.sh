@@ -37,7 +37,7 @@ if ! wp core is-installed --path=${WP_DIR} --allow-root 2>/dev/null; then
     wp core install \
         --path=${WP_DIR} \
         --url=https://${DOMAIN_NAME} \
-        --title='Mon Site' \
+        --title='Inception' \
         --admin_user=${ADMIN_USER} \
         --admin_password=${ADMIN_PASSWORD} \
         --admin_email=${ADMIN_EMAIL} \

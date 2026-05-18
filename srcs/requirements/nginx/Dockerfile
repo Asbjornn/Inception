@@ -1,5 +1,5 @@
 # construit le container depuis cette version de debian
-FROM debian:bullseye
+FROM debian:bookworm
 
 # installe nginx && opensll
 RUN apt-get update && apt-get install -y \

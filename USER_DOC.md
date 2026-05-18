@@ -60,7 +60,13 @@ On the browser go to:
 ```
 https://localhost/wp-admin
 ```
+You can now login as admin
+- User = wpadmin
+- Wordpass is in the secrets directory
 
+Or as the user
+- User = wpeditor
+- Wordpass is in the secrets directory
 
 <br>
 

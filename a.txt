@@ -127,52 +127,6 @@ Cela crée une image qu'on pourra run avec "docker run <image>"
 
 
 
-
-
-
-
-
-
-
-
-
-================================================================================================================
-
-Docker compose
-
-les services:
-_name_:
-    build: ./requirements/mariadb	=> chemin vers l'image du container
-    container_name: mariadb			=> nom du container
-    restart: always					=> permet de redemarrer si crash
-    volumes:						=> monte le volume mariadb dans le dossier /var/lib/mysql
-     - mariadb:/var/lib/mysql		   format volume:path
-    networks:						=> connecte le container au reseau inception
-     - inception
-    env_file: .env					=> charge les variable du .env dans le container 
-									   (comme un export DOMAIN_NAME=gcauchy.42.fr)
-    secrets:						=> chaque secret devient un fichier dans le container
-      - db_password					   avec le path /run/secrets/db_password
-      - db_root_password
-
-networks:							=> reseau virtuel nommé inception
-	inception:						=> type bridge = réseau isolé, communication uniquement entre eux
-		driver:bridge				
-
-volumes:
-	mariadb:
-		driver:local				=> stockage local
-		driver_opts:				=> options pour le driver
-			type: none				=> pas de systeme de fichier special
-			o: bind					=> lie un ficher au container
-			device: /home/gcauchy/data/mariadb	=> chemin sur de l'hote du volume
-
-secrets:
-	db_password:
-		file: ../secrets/db_password	=> path vers le secret
-
-
-
 ================================================================================================================
 
 Les mots de passe
@@ -190,3 +144,236 @@ Mot de passe utilisateur MariaDB pour Wordpress, permet a Wordpress de se connec
 
 -db_root_password
 Super mot de passe MariaDB, pour l'administration globale de MariaDB
+
+
+================================================================================================================
+
+
+Activity overview
+
+- How Docker and Docker compose work
+	- Docker
+		Plateform logicielle qui permet de creer, deployer et executer de application dans des containers.
+		Container -> unite legere et portable qui regroupe une appli et ses dependances.
+					 unite isolee et n'a pas besoin du systeme hote.
+	- docker compose
+		Fichier qui permet de definir, configurer et lancer plusieurs containers Docker a la fois.
+		Tres utile pour coordonner plusieurs services independants
+
+- Difference between a Docker image used with and without docker compose
+	- With
+		Une commande qui build tous les containers du fichier.
+		Facilitation pour creer des reseaux entre les containers
+	- Without
+		Doit build le container manuellement, tout dans une meme ligne de commande.
+		Rapide pour des test
+
+- Pertinence of the directory structure
+	Chaque container a un role unique et bien defini, facilite ma maintenance et les mise a jours.
+	Securite pas isolation, les containers ont uniauement leurs ports utilse ouverts
+	Persistance des donnees avec les deux volumes
+
+
+
+
+
+================================================================================================================
+
+NGINX
+
+- fichier exec
+
+```
+set -e		=> arrete si une commande echoue
+
+mkdir -p /etc/nginx/ssl
+
+if [ ! -f /etc/ssl/certs/nginx.crt ]; then		=> verif si le certificat existe
+    openssl req -x509 -nodes \					=> -x509 = certificat genere tout de suis sans demande, -nodes = cle privee non chiffree par MDP
+    -days 365 \									=> valide 1 ans
+    -newkey rsa:2048 \							=> genere nouvelle cle RDA de 2048 bits
+    -keyout /etc/nginx/ssl/inception.key \		=> ou ecrire la cle
+    -out /etc/nginx/ssl/inception.crt \			=>  ou ecrire le cerificat
+    -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=${DOMAIN_NAME}"	=> CN=${DOMAIN_NAME} = nom domaine associe au certificat
+fi
+
+exec nginx -g 'daemon off;'		=> lance nginx en premier plan
+```
+- fichier config
+events {}
+
+http {
+    server {
+        listen 443 ssl;										=> ecoute le port 443 en https
+        server_name gcauchy.42.fr;							=> repond uniquement aux requetes adresses a ce domaine
+
+        ssl_certificate     /etc/nginx/ssl/inception.crt;	=> certificat
+        ssl_certificate_key /etc/nginx/ssl/inception.key;	=> cle
+        ssl_protocols       TLSv1.2 TLSv1.3;				=> autorise uniquement TLSv1.2 TLSv1.3
+
+        root    /var/www/html;								=> dossier racine des fichiers
+        index   index.php index.html;						=> ordre de priorite des fichiers index
+
+        location / {										=> pour chaque requete, nginx essaye dans l'ordre
+            try_files $uri $uri/ /index.php?$args;			   $uri, $uri/, sinon renvoie vers index.php avec le parametre de la requete
+        }
+
+        location ~ \.php$ {									=> tout fichier.php est envoye via FastCGI
+            include fastcgi_params;
+            fastcgi_pass wordpress:9000;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+    }
+}
+
+
+================================================================================================================
+
+MariaDB
+
+- fichier exec
+
+```
+#!/bin/bash
+set -e
+
+DB_PASSWORD=$(cat /run/secrets/db_password)				=> recupere le MDP dans le fichier
+DB_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)	=> recupere le MDP dans le fichier
+
+if [ ! -f /var/lib/mysql/.initialized ]; then			=> verifie si la base est deja initialisee
+    echo "Initializing database..."
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null	=> cree les table systeme de MariaDB dans le datadir
+																		   output vers /dev/null car verbeuse et inutile
+	mysqld --user=mysql --skip-networking &				=> demarre MariaDB en arriere plan(&) avec (--skip-networking) pour ne pas accepter de connexion exterieur
+    until mysqladmin ping --silent; do sleep 1; done	=> attend que MariaDB soit prete a accepter de des connexions
+
+    mysql -u root <<-EOF	=> ouvre un heredoc
+	ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASSWORD}';				=> ALTER USER root definir le mot de passe root
+	CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};								=> CREATE DATABASE cree la base WordPress
+	CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';	=> CREATE USER cree le user avec '%' qui signifie n'importe quelle IP
+	GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';				=> GRANT ALL PRIVILEGS donne tous les droits a wp_user sur la bas WordPress
+	FLUSH PRIVILEGES;																=> FLUSH PRIVILEGES recharche la table des permissions
+EOF
+
+    mysqladmin -u root -p"${DB_ROOT_PASSWORD}" shutdown		=> eteint proprement le mysqld temporaire
+    touch /var/lib/mysql/.initialized						=> cree le fichier sur le volume persistant
+    echo "Database initialized."
+fi
+
+echo "Starting MariaDB (normal mode)..."
+exec mysqld --user=mysql					=> redemarre mysqld en mode normal avec le reseau
+```
+
+- fichier config
+
+[mysqld]
+
+user = mysql						=> MariaDB utilise le user systeme mysql
+port = 3306							=> ouvre le port 3306
+pid-file = /run/mysqld/mysqld.pid	=> chemin du fichier pid, contient le numero du processus mysql en cours
+basedir = /usr						=> repertoire racine d'installation de MariaDB
+datadir = /var/lib/mysql			=> repertoire ou sont stockees les donnes
+tmpdir = /tmp						=> dossier pour les dichier temporaire
+lc-messages-dir = /usr/share/mysql	=> dichier de traductions des messages d'erreur
+lc-messages = en_US					=> quelle langue utiliser
+skip-external-locking				=> desactive le verrouillage fichier niveau OS
+bind-address = 0.0.0.0				=> accepte les connexions de touts interfaces reseau
+expire_logs_days = 10				=> supprime les binary logs de plus de 10 jours
+character-set-server = utf8mb4		=> encodage UTF utilise pour supporter tous les caracteres
+collation-server = utf8mb4_general_ci
+
+
+
+scp -r -P 2222 path(ce qui est copie) username@127.0.0.1:path(vers ou copier)
+
+
+
+
+================================================================================================================
+
+WordPress
+
+- fichier exec
+
+```
+#!/bin/sh
+
+set -e
+
+DB_PASSWORD=$(cat /run/secrets/db_password)										=> recupere le MDP de mariaDB
+ADMIN_PASSWORD=$(cat /run/secrets/credentials | grep ADMIN_PASS | cut -d= -f2)	=> recupere le MDP admin
+USER_PASSWORD=$(cat /run/secrets/credentials | grep USER_PASS | cut -d= -f2)	=> recupere le MDP user
+
+WP_DIR=/var/www/html
+
+mkdir -p ${WP_DIR}		=> cree le fichier pour wordpress
+
+if [ ! -f ${WP_DIR}/index.php ]; then				=>  telecharge WordPress si pas deja present
+    echo "Downloading WordPress..."
+    wp core download --path=${WP_DIR} --allow-root	=> telecharge wordpress
+fi
+
+if [ ! -f ${WP_DIR}/wp-config.php ]; then			=> genere le fichier de config si pas deja present
+    echo "Creating wp-config.php..."
+    wp config create \
+        --path=${WP_DIR} \
+        --dbname=${MYSQL_DATABASE} \		=> nom de la db
+        --dbuser=${MYSQL_USER} \			=> user de la db
+        --dbpass=${DB_PASSWORD} \			=> MDP de la db
+        --dbhost=mariadb \				
+        --allow-root
+fi
+
+while ! wp db check --path=${WP_DIR} --allow-root 2>/dev/null; do	=> boucle jusqu'a que la connexion MariaDB soit etablie
+    echo 'En attente de MariaDB...'
+    sleep 2 
+done
+
+if ! wp core is-installed --path=${WP_DIR} --allow-root 2>/dev/null; then	=> verifie si les tables WordPress existent
+    echo "Installing WordPress..."
+
+    wp core install \							=> cree toutes les tables
+        --path=${WP_DIR} \
+        --url=https://${DOMAIN_NAME} \
+        --title='Mon Site' \
+        --admin_user=${ADMIN_USER} \
+        --admin_password=${ADMIN_PASSWORD} \
+        --admin_email=${ADMIN_EMAIL} \
+        --allow-root
+
+    wp user create ${WP_USER} ${WP_USER_EMAIL} \	=> cree un second utilisateur
+        --role=author \								=> attribue le rolt autor, peut ecrire des articles mais pas acceds aux reglages d'administration
+        --user_pass=${USER_PASSWORD} \
+        --path=${WP_DIR} \
+        --allow-root
+fi
+
+chown -R www-data:www-data ${WP_DIR}			=> donne la propriete de tous les fichier a l'utilisateur www-data
+
+exec php-fpm8.2 -F		=> lance PHP-FPM en foreground(-F)
+```
+
+
+- fichier config
+
+=> utilisateur et groupe sous lesquels les processus s'éxecuteront
+user = www-data
+group = www-data
+
+=> ecoute sur n'importe quelle adresses sur le port 9000
+listen = 0.0.0.0:9000
+
+=> propriétaire et groupe du socket utilisé
+listen.owner = www-data
+listen.group = www-data
+
+=> rend le processus PHP dynamique pour s'adapter au nombre de processus
+pm = dynamic
+=> nombre de processus enfant max
+pm.max_children = 5
+=> nombre de processus au lancement
+pm.start_servers = 2
+=> nombre de processus inactif min à conserver
+pm.min_spare_servers = 1
+=> nombre de processus inactif max a conserver
+pm.max_spare_servers = 3
