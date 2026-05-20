@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+chown -R mysql:mysql /var/lib/mysql
+
 DB_PASSWORD=$(cat /run/secrets/db_password)
 DB_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
 
@@ -26,3 +28,6 @@ fi
 
 echo "Starting MariaDB (normal mode)..."
 exec mysqld --user=mysql
+
+
+salut je suis gabin cauchy et j'ecris avec 4 doigts sur chaque mains

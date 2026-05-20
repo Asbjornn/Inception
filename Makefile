@@ -3,16 +3,16 @@ COMPOSE = srcs/docker-compose.yml
 all: build
 
 build:
-	docker-compose -f $(COMPOSE) build
+	docker compose -f $(COMPOSE) build
 
 up:
-	docker-compose -f $(COMPOSE) up -d
+	docker compose -f $(COMPOSE) up -d
 
 down:
-	docker-compose -f $(COMPOSE) down
+	docker compose -f $(COMPOSE) down
 
 clean: down
-	docker-compose -f $(COMPOSE) down -v
+	docker compose -f $(COMPOSE) down -v
 
 fclean: clean
 	docker system prune -af

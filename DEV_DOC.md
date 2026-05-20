@@ -72,6 +72,18 @@ cd .secrets
 
 ## Build & launch
 
+### **Get the project**
+At first you have to open a vm to copy the project in.  
+Use the command :
+```bash
+scp -r -P [port] [path to file to copy] [user@host:]destination
+scp -r -P 2222 /home/gcauchy/goinfre/... gcauchy@127.0.0.1:/home/gcauchy/
+```
+After that you need to add the password to the repo
+```bash
+
+```
+
 ### **Build**
 
 To build the project the Makefile will use docker compose command  
@@ -80,7 +92,7 @@ Run one of these commands to build the containers
 make 
 make build
 
-# run this command
+# or run this command
 docker-compose -f srcs/docker-compose.yml build
 ```
 Now the docker compose built all the containers  
@@ -93,7 +105,7 @@ You can now run
 ```bash
 make up
 
-# run this command
+# or run this command
 docker-compose -f srcs/docker-compose.yml up -d
 ```
 With that all the concainters are launch and you can go on a browser with the url ***https://localhost*** to acces the site.
