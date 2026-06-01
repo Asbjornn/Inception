@@ -58,10 +58,6 @@ A lightweight, isolated runtime environment created from a Docker image.
 
 
 
-<code style="color : red">ceci est un test coloré</code>
-
-
-
 ## __Instructions__
 
 ### Installation
@@ -107,7 +103,7 @@ I also watched some videos on notion on this [Youtube channel](https://www.youtu
 
 After that i used a online tuto to see in what direction i need to go.
 
-I used AI to have answer on specific question to fully undestand them and to create a PDF to help me for the building of the all project.
+I used AI to have answer on specific question to fully undestand them and to create a PDF to help me for the building of the all project. I also used it to debug problems when launching my containers.
 
 
 # Projet description

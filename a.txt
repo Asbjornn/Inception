@@ -377,3 +377,21 @@ pm.start_servers = 2
 pm.min_spare_servers = 1
 => nombre de processus inactif max a conserver
 pm.max_spare_servers = 3
+
+
+
+---------------------------------------------------------
+
+Se connecter a mariaDB
+
+docker exec -it mariadb bash		# pour rentrer dans le container
+
+mysql -u root -p 					# pour acceder a la database
+ou 
+mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE
+
+une fois dedans 
+SHOW DATABASES;
+
+USE <database>
+SHOW TABLES;

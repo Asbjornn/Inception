@@ -18,10 +18,10 @@
 
 The stack includes the following services:
 
-|Service	|Description|
-|-----------|-----------|
-|Nginx		|Web server and reverse proxy|
-|MariaDB	|Database server for WordPress|
+|Service	|Description                                        |
+|-----------|---------------------------------------------------|
+|Nginx		|Web server and reverse proxy                       |
+|MariaDB	|Database server for WordPress                      |
 |WordPress	|Content Management System (CMS) hosting the website|
 
 All services ares defined in *docker-compose.yml*

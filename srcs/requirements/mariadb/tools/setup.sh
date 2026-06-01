@@ -28,6 +28,3 @@ fi
 
 echo "Starting MariaDB (normal mode)..."
 exec mysqld --user=mysql
-
-
-salut je suis gabin cauchy et j'ecris avec 4 doigts sur chaque mains

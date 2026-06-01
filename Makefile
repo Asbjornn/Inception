@@ -11,6 +11,11 @@ up:
 down:
 	docker compose -f $(COMPOSE) down
 
+volume:
+	sudo rm -rf /home/gcauchy/data/mariadb/.initialized
+	sudo rm -rf /home/gcauchy/data/mariadb/*
+	sudo rm -rf /home/gcauchy/data/wordpress/*
+
 clean: down
 	docker compose -f $(COMPOSE) down -v
 
@@ -19,4 +24,4 @@ fclean: clean
 
 re: fclean build up
 
-.PHONY: all build up down clean fclean re
+.PHONY: all build up down volume clean fclean re

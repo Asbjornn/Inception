@@ -74,20 +74,29 @@ cd .secrets
 
 ### **Get the project**
 At first you have to open a vm to copy the project in.  
-Use the command :
+Use the command scp (Secure Copy Protocol) to copy the repo in the vm via SSH, the prototype is :  
+``scp -r -P [port] [path to file to copy] [user@host:]destination``
 ```bash
-scp -r -P [port] [path to file to copy] [user@host:]destination
+# for example
 scp -r -P 2222 /home/gcauchy/goinfre/... gcauchy@127.0.0.1:/home/gcauchy/
 ```
-After that you need to add the password to the repo
+Next, you need to add the password to the repository from its root directory.
 ```bash
+touch secrets/credentials.txt
+touch secrets/db_password.txt
+touch secrets/db_root_password.txt
 
+# and then add password in the file
+echo "ADMIN_PASS=<password>" > secrets/credentials.txt
+echo "USER_PASS=<password>" >> secrets/credentials.txt
+echo "<password>" > secrets/db_password.txt
+echo "<password>" > secrets/db_root_password.txt
 ```
 
 ### **Build**
 
 To build the project the Makefile will use docker compose command  
-Run one of these commands to build the containers
+Run one of these commands to build the containers :
 ```bash
 make 
 make build
@@ -95,20 +104,20 @@ make build
 # or run this command
 docker-compose -f srcs/docker-compose.yml build
 ```
-Now the docker compose built all the containers  
+Now the docker compose built all the containers.  
 
 <br>
 
 ### **Launch**
 
-You can now run 
+You can now run the project
 ```bash
 make up
 
 # or run this command
 docker-compose -f srcs/docker-compose.yml up -d
 ```
-With that all the concainters are launch and you can go on a browser with the url ***https://localhost*** to acces the site.
+With that all the concainters are launch and you can go on a browser with the url ***https://gcauchy.42.fr*** to acces the site.
 
 
 <br>
@@ -152,7 +161,7 @@ Inspect a volume to have more informations :
 docker volume inspect <container_name>
 ```
 
-<br>
+
 
 ### Docker image
 
